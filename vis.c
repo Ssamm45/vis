@@ -352,8 +352,12 @@ static void window_draw_selection(View *view, Selection *cur, CellStyle *style) 
 		while (col < end) {
 			if (cell_color_equal(l->cells[col].style.fg, style->bg)) {
 				CellStyle old = l->cells[col].style;
-				l->cells[col].style.fg = old.bg;
-				l->cells[col].style.bg = old.fg;
+				if (!cell_color_equal(old.fg, old.bg)) {
+					l->cells[col].style.fg = old.bg;
+					l->cells[col].style.bg = old.fg;
+				} else {
+					l->cells[col].style.attr = style->attr;
+				}
 			} else {
 				l->cells[col].style.bg = style->bg;
 			}
@@ -813,9 +817,6 @@ void vis_do(Vis *vis) {
 	View *view = win->view;
 	Action *a = &vis->action;
 
-	if (a->op == &vis_operators[VIS_OP_FILTER] && !vis->mode->visual)
-		vis_mode_switch(vis, VIS_MODE_VISUAL_LINE);
-
 	int count = MAX(a->count, 1);
 	if (a->op == &vis_operators[VIS_OP_MODESWITCH])
 		count = 1; /* count should apply to inserted text not motion */
@@ -1000,11 +1001,6 @@ void vis_do(Vis *vis) {
 			vis_mode_switch(vis, VIS_MODE_INSERT);
 		} else if (a->op == &vis_operators[VIS_OP_MODESWITCH]) {
 			vis_mode_switch(vis, a->mode);
-		} else if (a->op == &vis_operators[VIS_OP_FILTER]) {
-			if (a->arg.s)
-				vis_cmd(vis, a->arg.s);
-			else
-				vis_prompt_show(vis, ":|");
 		} else if (vis->mode == &vis_modes[VIS_MODE_OPERATOR_PENDING]) {
 			mode_set(vis, vis->mode_prev);
 		} else if (vis->mode->visual) {
@@ -1121,6 +1117,26 @@ bool vis_keys_utf8(Vis *vis, const char *keys, char utf8[static UTFmax+1]) {
 	return true;
 }
 
+typedef struct {
+	Vis *vis;
+	size_t len;         // length of the prefix
+	int count;          // how many bindings can complete this prefix
+	bool angle_bracket; // does the prefix end with '<'
+} PrefixCompletion;
+
+static bool isprefix(const char *key, void *value, void *data) {
+	PrefixCompletion *completion = data;
+	if (!completion->angle_bracket) {
+		completion->count++;
+	} else {
+		const char *start = key + completion->len;
+		const char *end = vis_keys_next(completion->vis, start);
+		if (end && start + 1 == end)
+			completion->count++;
+	}
+	return completion->count == 1;
+}
+
 static void vis_keys_process(Vis *vis, size_t pos) {
 	Buffer *buf = &vis->input_queue;
 	char *keys = buf->data + pos, *start = keys, *cur = keys, *end = keys, *binding_end = keys;;
@@ -1151,12 +1167,18 @@ static void vis_keys_process(Vis *vis, size_t pos) {
 					binding = match;
 					binding_end = end;
 				}
-				/* "<" is never treated as a prefix because it
-				 * is used to denote special key symbols */
-				if (strcmp(start, "<")) {
-					prefix = (!match && map_contains(mode->bindings, start)) ||
-					         (match && !map_leaf(mode->bindings, start));
-				}
+
+				const Map *pmap = map_prefix(mode->bindings, start);
+				PrefixCompletion completions = {
+					.vis = vis,
+					.len = cur - start,
+					.count = 0,
+					.angle_bracket = !strcmp(cur, "<"),
+				};
+				map_iterate(pmap, isprefix, &completions);
+
+				prefix = (!match && completions.count > 0) ||
+				         ( match && completions.count > 1);
 			}
 		}
 
@@ -1490,9 +1512,7 @@ void vis_repeat(Vis *vis) {
 	if (macro) {
 		Mode *mode = vis->mode;
 		Action action_prev = vis->action_prev;
-		if (count < 1 ||
-		    action_prev.op == &vis_operators[VIS_OP_CHANGE] ||
-		    action_prev.op == &vis_operators[VIS_OP_FILTER])
+		if (count < 1 || action_prev.op == &vis_operators[VIS_OP_CHANGE])
 			count = 1;
 		if (vis->action_prev.op == &vis_operators[VIS_OP_MODESWITCH])
 			vis->action_prev.count = 1;

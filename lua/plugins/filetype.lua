@@ -176,7 +176,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.inf$", "%.ni$" },
 	},
 	ini = {
-		ext = { "%.cfg$", "%.cnf$", "%.inf$", "%.ini$", "%.reg$" },
+		ext = { "%.cfg$", "%.cnf$", "%.conf$", "%.inf$", "%.ini$", "%.reg$" },
 	},
 	io_lang = {
 		ext = { "%.io$" },
@@ -195,7 +195,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.jsp$" },
 	},
 	latex = {
-		ext = { "%.bbl$", "%.dtx$", "%.ins$", "%.ltx$", "%.tex$", "%.sty$" },
+		ext = { "%.bbl$", "%.cls$", "%.dtx$", "%.ins$", "%.ltx$", "%.tex$", "%.sty$" },
 		mime = { "text/x-tex" },
 	},
 	ledger = {
@@ -301,7 +301,7 @@ vis.ftdetect.filetypes = {
 		mime = { "text/x-python" },
 	},
 	rc = {
-		ext = { "%.rc$", "%.es$", "%.xs" },
+		ext = { "%.rc$", "%.es$" },
 	},
 	rebol = {
 		ext = { "%.r$", "%.reb$" },
@@ -381,7 +381,7 @@ vis.ftdetect.filetypes = {
 	},
 	vb = {
 		ext = {
-			"%.asa$", "%.bas$", "%.cls$", "%.ctl$", "%.dob$",
+			"%.asa$", "%.bas$", "%.ctl$", "%.dob$",
 			"%.dsm$", "%.dsr$", "%.frm$", "%.pag$", "%.vb$",
 			"%.vba$", "%.vbs$"
 		},
@@ -397,6 +397,9 @@ vis.ftdetect.filetypes = {
 	},
 	wsf = {
 		ext = { "%.wsf$" },
+	},
+	xs = {
+		ext = { "%.xs$", "^%.xsin$", "^%.xsrc$" },
 	},
 	xml = {
 		ext = { "%.dtd$", "%.svg$", "%.xml$", "%.xsd$", "%.xsl$", "%.xslt$", "%.xul$" },
