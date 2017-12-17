@@ -258,7 +258,7 @@ static const KeyBinding bindings_normal[] = {
 	{ "S",                  ALIAS("^c$")                                },
 	{ "s",                  ALIAS("cl")                                 },
 	{ "<Tab>",              ACTION(SELECTIONS_ALIGN)                    },
-	{ "<C-w>",                  ACTION(UNDO)                                },
+	{ "W",                  ACTION(UNDO)                                },
 	{ "v",                  ACTION(MODE_VISUAL)                         },
 	{ "V",                  ACTION(MODE_VISUAL_LINE)                    },
 	{ "x",                  ACTION(DELETE_CHAR_NEXT)                    },
