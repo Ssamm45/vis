@@ -278,6 +278,9 @@ vis.ftdetect.filetypes = {
 	pkgbuild = {
 		ext = { "PKGBUILD" },
 	},
+	pony = {
+		ext = { "%.pony$" },
+	},
 	powershell = {
 		ext = { "%.ps1$" },
 	},
@@ -456,6 +459,7 @@ vis.events.subscribe(vis.events.WIN_OPEN, function(win)
 		local file = io.popen(string.format("file -bL --mime-type -- '%s'", name:gsub("'", "'\\''")))
 		if file then
 			local mime = file:read('*all')
+			file:close()
 			if mime then
 				mime = mime:gsub('%s*$', '')
 			end
