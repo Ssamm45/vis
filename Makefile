@@ -19,7 +19,7 @@ VERSION = $(shell git describe --always --dirty 2>/dev/null || echo "v0.4-git")
 CONFIG_HELP ?= 1
 CONFIG_CURSES ?= 1
 CONFIG_LUA ?= 1
-CONFIG_LPEG ?= 0
+CONFIG_LPEG ?= 1
 CONFIG_TRE ?= 0
 CONFIG_ACL ?= 0
 CONFIG_SELINUX ?= 0
@@ -60,9 +60,11 @@ vis: config.h config.mk *.c *.h
 	${CC} ${CFLAGS} ${CFLAGS_VIS} ${CFLAGS_EXTRA} ${SRC} ${LDFLAGS} ${LDFLAGS_VIS} -o $@
 
 vis-menu: vis-menu.c
+	echo ${CC} ${CFLAGS}
 	${CC} ${CFLAGS} ${CFLAGS_AUTO} ${CFLAGS_STD} ${CFLAGS_EXTRA} $< ${LDFLAGS} ${LDFLAGS_STD} ${LDFLAGS_AUTO} -o $@
 
 vis-digraph: vis-digraph.c
+	echo ${CC} ${CFLAGS}
 	${CC} ${CFLAGS} ${CFLAGS_AUTO} ${CFLAGS_STD} ${CFLAGS_EXTRA} $< ${LDFLAGS} ${LDFLAGS_STD} ${LDFLAGS_AUTO} -o $@
 
 vis-single-payload.inc: $(EXECUTABLES) lua/*
